@@ -1,3 +1,5 @@
+"""RAG chain: retrieves candidate engineers and generates match reasoning via LLM."""
+
 import os
 import re
 
@@ -46,6 +48,15 @@ _PROMPT = PromptTemplate(
 
 
 def build_prompt(job_text: str, candidates: list[dict]) -> str:
+    """Format job requirements and candidate list into the LLM prompt string.
+
+    Args:
+        job_text: Raw job description or requirement text.
+        candidates: List of candidate dicts as returned by retrieve().
+
+    Returns:
+        A formatted prompt string ready to be sent to the LLM.
+    """
     lines = []
     for i, c in enumerate(candidates, 1):
         lines.append(f"Candidate {i}: {c['name']}")
@@ -58,7 +69,16 @@ def build_prompt(job_text: str, candidates: list[dict]) -> str:
 
 
 def _parse_per_candidate_reasons(text: str, n: int) -> list[str]:
-    """Split LLM output into per-candidate reason strings using [Candidate N] markers."""
+    """Split LLM output into per-candidate reason strings using [Candidate N] markers.
+
+    Args:
+        text: Raw LLM response text containing structured [Candidate N] sections.
+        n: Expected number of candidates to extract.
+
+    Returns:
+        A list of length n where each element is the reason text for the
+        corresponding candidate. Returns an empty string for any section not found.
+    """
     reasons = []
     for i in range(1, n + 1):
         pattern = rf'\[Candidate {i}\](.*?)(?=\[Candidate {i + 1}\]|$)'
@@ -68,6 +88,15 @@ def _parse_per_candidate_reasons(text: str, n: int) -> list[str]:
 
 
 def generate_reasons(job_text: str, candidates: list[dict]) -> str:
+    """Call the LLM to generate match reasoning for each candidate engineer.
+
+    Args:
+        job_text: Job description used as context for the LLM.
+        candidates: List of candidate dicts as returned by retrieve().
+
+    Returns:
+        Raw LLM response text containing per-candidate explanations.
+    """
     llm = ChatOpenAI(
         model=LLM_MODEL,
         temperature=LLM_TEMPERATURE,
@@ -83,6 +112,21 @@ def generate_reasons(job_text: str, candidates: list[dict]) -> str:
 
 
 def run_rag(job_description: str, k: int = 3) -> list[dict]:
+    """Execute the full RAG pipeline: retrieve candidates and generate reasoning.
+
+    This is the main entry point for the application. It retrieves the top-k
+    matching engineers via semantic search and augments each result with an
+    LLM-generated explanation of why they fit the job.
+
+    Args:
+        job_description: Free-text job requirements to match against engineers.
+        k: Number of candidate engineers to retrieve and explain.
+
+    Returns:
+        A list of dicts, each with keys:
+            - engineer: candidate dict from retrieve()
+            - reason: LLM-generated explanation string for this candidate
+    """
     candidates = retrieve(job_description, k=k)
     reason_text = generate_reasons(job_description, candidates)
     per_candidate_reasons = _parse_per_candidate_reasons(reason_text, len(candidates))

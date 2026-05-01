@@ -1,3 +1,5 @@
+"""Embedding generation and ChromaDB index management for engineer profiles."""
+
 import json
 import os
 
@@ -11,11 +13,27 @@ ENGINEERS_DATA_PATH = "./data/engineers.json"
 
 
 def load_engineers(filepath: str = ENGINEERS_DATA_PATH) -> list[dict]:
+    """Load engineer profiles from a JSON file.
+
+    Args:
+        filepath: Path to the JSON file containing engineer data.
+
+    Returns:
+        A list of engineer profile dicts.
+    """
     with open(filepath, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def build_profile_text(engineer: dict) -> str:
+    """Serialize an engineer profile dict into a single text string for embedding.
+
+    Args:
+        engineer: A dict with keys such as 氏名, 概要, スキル, 経験年数, and 経歴.
+
+    Returns:
+        A concatenated string representation of the engineer's profile.
+    """
     name = engineer.get("氏名", "")
     summary = engineer.get("概要", "")
     skills = ", ".join(engineer.get("スキル", []))
@@ -28,6 +46,19 @@ def build_profile_text(engineer: dict) -> str:
 
 
 def build_index(engineers: list[dict] = None, collection_name: str = COLLECTION_NAME) -> int:
+    """Embed all engineer profiles and store them in a ChromaDB collection.
+
+    Drops any existing collection with the same name before rebuilding, ensuring
+    idempotent execution.
+
+    Args:
+        engineers: List of engineer profile dicts. Loads from the default JSON
+            file when None.
+        collection_name: Name of the ChromaDB collection to create.
+
+    Returns:
+        The number of engineer documents indexed.
+    """
     if engineers is None:
         engineers = load_engineers()
 
