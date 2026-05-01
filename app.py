@@ -1,3 +1,5 @@
+"""Streamlit entry point: job requirement input, index build, and RAG-based engineer matching UI."""
+
 import os
 
 import streamlit as st
