@@ -73,13 +73,12 @@
 |------|--------|
 | OS | macOS (development machine) |
 | Python | 3.14 (venv) |
-| ChromaDB | Local file storage (`./chroma_db_test/`) |
+| ChromaDB | Temporary directory via pytest `tmp_path` fixture (auto-cleaned) |
 | OpenAI API | Real API key used (be mindful of test cost budget) |
 
 **Test Configuration**
 
-- Use a separate directory for the test ChromaDB (`./chroma_db_test/`), distinct from the production database
-- Optionally add a `TEST_MODE` flag to `.env`
+- Use pytest `tmp_path` fixture to redirect ChromaDB storage to a temporary directory for test isolation (see `tests/test_retriever.py` `chroma_dir` fixture)
 - Mock the OpenAI API in unit tests to avoid incurring API costs
 
 **Streamlit Cloud Verification**
