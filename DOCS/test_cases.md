@@ -1,7 +1,7 @@
 # Test Cases
 
 **Project Name:** SES-RAG-DEMO  
-**Version:** 1.1  
+**Version:** 1.2  
 **Date Updated:** 2026-05-02
 
 **Legend**
@@ -54,11 +54,11 @@
 
 | No. | Test Description | Priority | Type | Result |
 |-----|------------------|----------|------|--------|
-| A-01 | The Streamlit app starts successfully and displays the title and text area | H | ST | - |
-| A-02 | Clicking the "Build Index" button in the sidebar displays a success message and the record count | H | ST | - |
-| A-03 | Entering job requirements in the text area and clicking "Run Matching" displays 3 candidates with matching rationale | H | ST | - |
+| A-01 | The Streamlit app starts successfully and displays the title and text area | H | ST | O |
+| A-02 | Clicking the "Build Index" button in the sidebar displays a success message and the record count | H | ST | O |
+| A-03 | Entering job requirements in the text area and clicking "Run Matching" displays 3 candidates with matching rationale | H | ST | O |
 | A-04 | A loading spinner (e.g., `st.spinner`) is displayed during execution | M | ST | - |
-| A-05 | The similarity score is displayed as a numeric value in the results | M | ST | - |
+| A-05 | The similarity score is displayed as a numeric value in the results | M | ST | O |
 
 ---
 
@@ -66,10 +66,10 @@
 
 | No. | Test Description | Priority | Type | Result |
 |-----|------------------|----------|------|--------|
-| I-01 | The full flow of index build → run matching completes without errors | H | ST | - |
+| I-01 | The full flow of index build → run matching completes without errors | H | ST | O |
 | I-02 | After rebuilding the index, re-running a search still returns results correctly (no duplicate registration issues) | H | IT | - |
-| I-03 | Inputting 3 different job requirement texts (Python backend, infrastructure, PM-type) each returns different candidates (diversity of search results) | M | ST | - |
-| I-04 | The same behavior as I-01 is confirmed in the Streamlit Cloud deployed environment | H | ST | - |
+| I-03 | Inputting 3 different job requirement texts (Python backend, infrastructure, PM-type) each returns different candidates (diversity of search results) | M | ST | O |
+| I-04 | The same behavior as I-01 is confirmed in the Streamlit Cloud deployed environment | H | ST | O |
 | I-05 | API call response times are within the specified range (search: 3 seconds, generation: 10 seconds) | M | ST | - |
 
 ---
@@ -91,14 +91,15 @@
 
 | Item | Detail |
 |------|--------|
-| Date Executed | 2026-05-01 |
+| Date Executed | 2026-05-01 (UT/IT), 2026-05-02 (ST visual) |
 | Executed By | mag |
 | Total Test Cases | 31 |
-| Passed | 12 (E-01, E-02, E-03, E-04, E-05, R-01, R-02, R-03, R-04, C-01, C-02, C-03) |
+| Passed | 19 (E-01–E-05, R-01–R-04, C-01–C-03, A-01, A-02, A-03, A-05, I-01, I-03, I-04) |
 | Failed | 0 |
-| Not Executed | 19 (R-05, C-04, C-05, A-01–A-05, I-01–I-05, X-01–X-06) |
+| Not Executed | 12 (R-05, C-04, C-05, A-04, I-02, I-05, X-01–X-06) |
 
 **Notes**
 
 - UT/IT (12 cases) executed via pytest on local environment (Python 3.14, venv). All mocked; no real API calls required.
-- R-05, C-04, C-05 and ST cases pending — require real OpenAI API key and ChromaDB index.
+- ST (7 cases) visually confirmed on Streamlit Cloud deployed environment on 2026-05-02.
+- Remaining 12 cases require real API call or specific error conditions to reproduce.
