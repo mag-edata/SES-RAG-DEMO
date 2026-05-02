@@ -83,15 +83,10 @@ Output (Top Match)
 
 ## Evaluation (Prototype)
 
-A small manual evaluation (20 Job Requirements × 20 Engineer Profiles):
+Manual evaluation pending — qualitative observations only.
 
-- Keyword search baseline:
-  - Relevant matches in Top-3: ~60%
-
-- RAG-based matching:
-  - Relevant matches in Top-3: ~80%
-
-※ "Relevant" defined as: salesperson would shortlist the candidate
+Automated accuracy metrics (e.g. Top-3 precision) are planned for a future phase.
+Current validation: unit tests (12 passing) covering embedding, retrieval, and chain logic.
 
 ---
 
@@ -194,6 +189,16 @@ SES-RAG-DEMO/
 ├── data/
 │   ├── jobs.json           # Sample job requirements (20 entries)
 │   └── engineers.json      # Sample engineer profiles (20 entries)
+├── tests/
+│   ├── test_embedder.py    # Unit tests: embedding & indexing (E-01, E-02, E-05)
+│   ├── test_retriever.py   # Integration tests: similarity search (E-03, E-04, R-01~R-04)
+│   └── test_chain.py       # Unit tests: RAG chain (C-01, C-02, C-03)
+├── DOCS/
+│   ├── requirements_definition.md
+│   ├── external_design.md
+│   ├── internal_design.md
+│   ├── test_design.md
+│   └── test_cases.md
 ├── requirements.txt
 ├── .env.example
 └── README.md
