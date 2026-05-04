@@ -153,6 +153,8 @@ This project demonstrates:
 
 > [https://ses-rag-demo-main.streamlit.app/]
 
+> **First-time use:** Click **Build Index** in the sidebar to initialize the engineer vector index before running a match.
+
 ---
 
 ## Getting Started
@@ -173,6 +175,9 @@ cp .env.example .env
 
 # 4. Run
 streamlit run app.py
+
+# 5. On first run, click "Build Index" in the sidebar to populate the
+#    engineer vector index (calls the OpenAI Embeddings API for 20 records).
 ```
 
 ---
