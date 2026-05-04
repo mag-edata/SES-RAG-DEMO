@@ -7,6 +7,8 @@ from openai import OpenAI
 
 from rag.embedder import CHROMA_PERSIST_DIR, COLLECTION_NAME, EMBEDDING_MODEL
 
+TOP_K = 3
+
 
 def get_collection(collection_name: str = COLLECTION_NAME):
     """Open and return an existing ChromaDB collection.
@@ -21,7 +23,7 @@ def get_collection(collection_name: str = COLLECTION_NAME):
     return chroma.get_collection(collection_name)
 
 
-def search_engineers(query_text: str, top_k: int = 3) -> list[dict]:
+def search_engineers(query_text: str, top_k: int = TOP_K) -> list[dict]:
     """Embed a query string and retrieve the closest engineer documents from ChromaDB.
 
     Args:
@@ -50,7 +52,7 @@ def search_engineers(query_text: str, top_k: int = 3) -> list[dict]:
     ]
 
 
-def retrieve(query: str, k: int = 3) -> list[dict]:
+def retrieve(query: str, k: int = TOP_K) -> list[dict]:
     """Return the top-k matching engineers for a job query, with similarity scores.
 
     Wraps search_engineers and normalises the cosine distance into a similarity
