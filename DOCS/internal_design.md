@@ -150,8 +150,8 @@
 |-----|------|-------------|
 | name | str | Engineer name |
 | skills | str | Skill list (comma-separated string) |
-| experience_years | int | Years of experience |
-| availability | str | Availability status ("available" / "unavailable") |
+| experience_years | float | Years of experience (stored as float to support fractional years such as 8.5) |
+| availability | str | Availability / earliest start date as a free-form string (e.g. "即日", "20260415"). Source field: `参画可能時期`. |
 
 **Persistence Configuration**
 
@@ -182,9 +182,26 @@ guarantee hiring outcomes.
 [Candidate Engineer List]
 {candidates_text}
 
-For each of the above candidate engineers, please explain in 2-3 bullet
-points how they align with the job requirements.
+For each candidate engineer, explain in 2-3 bullet points how they align
+with the job requirements.
+Use exactly this format (do not omit any [Candidate N] header):
+
+[Candidate 1]
+- reason
+- reason
+
+[Candidate 2]
+- reason
+- reason
+
+[Candidate 3]
+- reason
+- reason
 ```
+
+> The explicit `[Candidate N]` headers are required so that `chain.py` can
+> deterministically split the LLM response into per-candidate reason
+> strings via regex (`_parse_per_candidate_reasons`).
 
 **`candidates_text` Format**
 
