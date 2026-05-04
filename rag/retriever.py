@@ -74,7 +74,7 @@ def retrieve(query: str, k: int = TOP_K) -> list[dict]:
             "summary": r["document"],
             "skills": r["metadata"].get("skills", ""),
             "experience_years": r["metadata"].get("experience_years", 0),
-            "score": max(0.0, 1 - r["distance"]),
+            "score": min(1.0, max(0.0, 1 - r["distance"])),
         }
         for r in raw
     ]
