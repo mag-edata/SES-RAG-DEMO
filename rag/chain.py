@@ -6,7 +6,7 @@ import re
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 
-from rag.retriever import retrieve
+from rag.retriever import TOP_K, retrieve
 
 LLM_MODEL = "gpt-4o-mini"
 LLM_TEMPERATURE = 0.3
@@ -26,7 +26,7 @@ _USER_TEMPLATE = """\
 [Candidate Engineer List]
 {candidates_text}
 
-For each candidate engineer, explain in 2-3 bullet points how they align with the job requirements.
+For each candidate engineer, explain in 2-3 bullet points (in Japanese) how they align with the job requirements.
 Use exactly this format (do not omit any [Candidate N] header):
 
 [Candidate 1]
@@ -111,7 +111,7 @@ def generate_reasons(job_text: str, candidates: list[dict]) -> str:
     return response.content
 
 
-def run_rag(job_description: str, k: int = 3) -> list[dict]:
+def run_rag(job_description: str, k: int = TOP_K) -> list[dict]:
     """Execute the full RAG pipeline: retrieve candidates and generate reasoning.
 
     This is the main entry point for the application. It retrieves the top-k

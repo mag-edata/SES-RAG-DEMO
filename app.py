@@ -13,9 +13,9 @@ try:
 except Exception:
     pass
 
-st.set_page_config(page_title="SES Engineer Matching (RAG Demo)", layout="wide")
-st.title("SES Engineer Matching (RAG Demo)")
-st.caption("案件要件を入力すると、RAGを用いて最適なエンジニア候補をTop-3で提示します。")
+st.set_page_config(page_title="IT Engineer & Job Requirement Matching (RAG Demo)", layout="wide")
+st.title("IT Engineer & Job Requirement Matching (RAG Demo)")
+st.caption("案件要件を入力すると、RAGを用いて最適なエンジニア候補Top-3を提示します。")
 
 # ──────────────────────────────
 # Sidebar: Index build
@@ -52,11 +52,23 @@ with st.sidebar:
 # ──────────────────────────────
 job_text = st.text_area(
     "案件要件を入力してください",
-    height=150,
+    height=400,
     placeholder=(
-        "例: Pythonを使ったWebバックエンド開発。"
-        "FastAPIとAWSの経験必須。チームリード経験があれば尚可。"
-        "3ヶ月以上の参画を想定。"
+        "例：\n"
+        "タイトル: バックエンドエンジニア（Java/Spring Boot）\n"
+        "クライアント: 大手金融システム会社A\n"
+        "案件概要: 大規模な勘定系システムのリプレイスプロジェクト。Spring BootによるREST API開発およびマイクロサービス化を担当。既存COBOLシステムの解析・移行も含む。\n"
+        "Mustスキル: [Java, Spring Boot, REST API, Oracle SQL, Git]\n"
+        "Wantスキル: [COBOL, Oracle DB, マイクロサービス, AWS]\n"
+        "最低経験年数: 3\n"
+        "勤務形態: 常駐+リモート併用\n"
+        "勤務地: 東京都千代田区\n"
+        "期間: 20260401〜長期\n"
+        "工程: [基本設計, 詳細設計, 製造, 単体テスト, 結合テスト]\n"
+        "再委託: 不可\n"
+        "契約: 準委任\n"
+        "募集人数: 2\n"
+        "想定単価幅: 60〜78万円/月"
     ),
 )
 

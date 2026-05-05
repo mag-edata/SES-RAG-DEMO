@@ -153,6 +153,8 @@ This project demonstrates:
 
 > [https://ses-rag-demo-main.streamlit.app/]
 
+> **First-time use:** Click **Build Index** in the sidebar to initialize the engineer vector index before running a match.
+
 ---
 
 ## Getting Started
@@ -173,6 +175,9 @@ cp .env.example .env
 
 # 4. Run
 streamlit run app.py
+
+# 5. On first run, click "Build Index" in the sidebar to populate the
+#    engineer vector index (calls the OpenAI Embeddings API for 20 records).
 ```
 
 ---
@@ -211,10 +216,3 @@ SES-RAG-DEMO/
 This project is built on my experience as a former SES sales representative turned Python/NLP engineer. The matching problem is one I observed firsthand — and this demo is my attempt to solve it with modern LLM technology.
 
 The design focus is not just "how to implement RAG" but **"what decision should RAG support"** — treating the matching system as a decision-support tool rather than an automation.
-
----
-
-## Author
-
-**mag** — NLP/AI Engineer
-Former SES sales → Python Engineer
