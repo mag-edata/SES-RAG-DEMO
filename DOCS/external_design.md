@@ -29,7 +29,7 @@
 **Input Area**
 
 - Label: "Enter job requirements"
-- Component: `st.text_area` (approx. 150px height)
+- Component: `st.text_area` (approx. 400px height)
 - Placeholder: Sample input text displayed as a hint
 - Button: "Run Matching" (`st.button`)
 
