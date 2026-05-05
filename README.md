@@ -216,10 +216,3 @@ SES-RAG-DEMO/
 This project is built on my experience as a former SES sales representative turned Python/NLP engineer. The matching problem is one I observed firsthand — and this demo is my attempt to solve it with modern LLM technology.
 
 The design focus is not just "how to implement RAG" but **"what decision should RAG support"** — treating the matching system as a decision-support tool rather than an automation.
-
----
-
-## Author
-
-**mag** — NLP/AI Engineer
-Former SES sales → Python Engineer
