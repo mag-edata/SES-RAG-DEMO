@@ -23,7 +23,7 @@
 
 **Layout**
 
-- Page title: `SES Engineer Matching (RAG Demo)`
+- Page title: `IT Engineer & Job Requirement Matching (RAG Demo)`
 - Subtitle: Brief description of the system (1-2 lines)
 
 **Input Area**
