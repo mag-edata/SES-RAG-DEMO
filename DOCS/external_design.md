@@ -137,5 +137,5 @@ Matching Rationale:
 | temperature | 0.3 (prioritizing reproducibility) |
 | Input (system) | Role instruction and output format specification for matching reason generation |
 | Input (user) | Job requirement text + candidate engineer info (JSON format) |
-| Output | Matching rationale text (in English, bullet points) |
+| Output | Matching rationale text (in Japanese, bullet points) |
 | Call Timing | During matching execution (up to k calls or 1 batch call for top-k candidates) |

@@ -26,7 +26,7 @@ _USER_TEMPLATE = """\
 [Candidate Engineer List]
 {candidates_text}
 
-For each candidate engineer, explain in 2-3 bullet points how they align with the job requirements.
+For each candidate engineer, explain in 2-3 bullet points (in Japanese) how they align with the job requirements.
 Use exactly this format (do not omit any [Candidate N] header):
 
 [Candidate 1]
