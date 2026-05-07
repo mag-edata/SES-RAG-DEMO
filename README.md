@@ -24,6 +24,17 @@ As a result:
 - High variance in matching quality
 - Limited reproducibility of successful decisions
 
+### Why this is structurally hard to automate
+
+SES matching fails with keyword search not just because of scale, but because of structural ambiguity in the data itself:
+
+- **Skill notation variance** — "Java", "Java SE", "J2EE", and "Spring Boot" may represent overlapping or distinct competencies depending on context
+- **Implicit capabilities** — an engineer's résumé rarely captures transferable skills or domain intuition not tied to a named technology
+- **Recency bias** — matching systems tend to over-weight the most recently listed skills, even when older experience is more relevant
+- **Domain transferability** — experience in automotive control systems may be highly relevant to aerospace firmware, but keyword overlap will be near zero (e.g., AUTOSAR vs DO-178C)
+
+These factors make the problem a **semantic understanding problem**, not a lookup problem.
+
 ---
 
 ## Solution
@@ -81,12 +92,23 @@ Output (Top Match)
 
 ---
 
-## Evaluation (Prototype)
+## Evaluation
 
-Manual evaluation pending — qualitative observations only.
+### Current Validation
 
-Automated accuracy metrics (e.g. Top-3 precision) are planned for a future phase.
-Current validation: unit tests (12 passing) covering embedding, retrieval, and chain logic.
+Unit tests: 28 passing across embedding, retrieval, and chain logic.  
+Match outputs reviewed manually against domain knowledge.
+
+### Why no automated metrics yet
+
+Automated retrieval evaluation (e.g., Precision@K) requires human-labeled ground truth —  
+a judgment of which engineer is the "correct" match for each job requirement.
+
+For this prototype, the design priority was validating the decision-support framing:  
+confirming that LLM-generated explanations are grounded in retrieval, not hallucinated.  
+Precision optimization comes after that baseline is established.
+
+**Planned metrics:** Precision@3, explanation usefulness (human evaluation), latency, token cost per query.
 
 ---
 
@@ -110,6 +132,12 @@ Current validation: unit tests (12 passing) covering embedding, retrieval, and c
 - Sufficient semantic performance for prototype
 - Lower cost → faster iteration
 
+### Why ChromaDB
+
+- **Local-first**: runs in-process with no server setup — suitable for rapid prototyping
+- **Low operational overhead**: persistent storage without infrastructure management
+- **Fast iteration**: easy to rebuild the index during development without migration complexity
+
 ### Why explanation matters
 
 In SES sales, selecting a candidate is not enough — the salesperson must also explain *why*.
@@ -122,7 +150,7 @@ This system externalizes that reasoning, enabling:
 
 ## Limitations
 
-- Small dataset (20 × 20)
+- Dataset scale: 20 jobs × 20 engineers (synthetic) — sufficient for pipeline and schema validation; production scaling would require real-world data ingestion and evaluation
 - No automated evaluation metrics (manual only)
 - Sensitive to prompt quality
 
