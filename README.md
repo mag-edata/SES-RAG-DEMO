@@ -4,6 +4,8 @@ A RAG-based decision support system that semantically matches System Engineering
 
 ---
 
+!["result_010.png"](/DOCS/result_010.png)
+
 ## Problem
 
 In SES sales, matching job requirements with engineer profiles is a time-consuming and highly subjective process.
