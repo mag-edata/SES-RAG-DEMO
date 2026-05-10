@@ -36,7 +36,7 @@
 **Result Display Area**
 
 - Displayed after search execution (with loading spinner)
-- Each candidate engineer displayed using `st.expander` or `st.card`
+- Each candidate engineer displayed using `st.expander`
 - Display fields: rank, engineer name, skill summary, similarity score, matching rationale
 - Rationale displayed as bullet points (2-3 items)
 
