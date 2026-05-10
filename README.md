@@ -1,10 +1,22 @@
 # SES-RAG-DEMO
 
-A RAG-based decision support system that semantically matches System Engineering Service (SES) job requirements with engineer profiles.
+> RAG-based decision support system for semantically matching SES job requirements with engineer profiles.
+
+- Retrieves top candidate engineers based on semantic similarity — beyond keyword matching
+- Generates structured reasoning for why each candidate matches, not just a ranked list
+- Designed as decision-support infrastructure, not automation
 
 ---
 
+## Demo
+
 !["result_010.png"](/DOCS/result_010.png)
+
+> [https://ses-rag-demo-main.streamlit.app/]
+
+> **First-time use:** Click **Build Index** in the sidebar to initialize the engineer vector index before running a match.
+
+---
 
 ## Problem
 
@@ -160,12 +172,14 @@ This system externalizes that reasoning, enabling:
 
 ## Tech Stack
 
-- **LLM:** OpenAI API (gpt-4o-mini)
-- **Embedding:** OpenAI text-embedding-3-small
-- **Vector DB:** ChromaDB
-- **Framework:** LangChain
-- **UI:** Streamlit
-- **Language:** Python 3.14
+| Role | Technology |
+|---|---|
+| LLM | OpenAI API (gpt-4o-mini) |
+| Embedding | OpenAI text-embedding-3-small |
+| Vector DB | ChromaDB |
+| Framework | LangChain |
+| UI | Streamlit |
+| Language | Python 3.14 |
 
 ---
 
@@ -176,14 +190,6 @@ This project demonstrates:
 - Semantic matching of unstructured text
 - LLM-based reasoning on top of retrieval
 - Designing AI systems as **decision-support infrastructure**, not just automation tools
-
----
-
-## Demo
-
-> [https://ses-rag-demo-main.streamlit.app/]
-
-> **First-time use:** Click **Build Index** in the sidebar to initialize the engineer vector index before running a match.
 
 ---
 
@@ -209,6 +215,32 @@ streamlit run app.py
 # 5. On first run, click "Build Index" in the sidebar to populate the
 #    engineer vector index (calls the OpenAI Embeddings API for 20 records).
 ```
+
+<details>
+<summary>Verified Environment</summary>
+
+**Runtime**
+
+| Item | Version / Details |
+|---|---|
+| OS | macOS Tahoe 26.3.1 |
+| Python | 3.14 |
+| Virtual environment | venv (standard library) |
+
+**Dependencies**
+
+| Package | Version | Purpose |
+|---|---|---|
+| openai | ≥1.0.0 | LLM & Embedding API |
+| langchain | ≥0.3.0 | RAG chain construction |
+| langchain-openai | ≥0.2.0 | LangChain × OpenAI integration |
+| langchain-community | ≥0.3.0 | ChromaDB integration |
+| chromadb | ≥0.5.0 | Vector DB |
+| streamlit | ≥1.38.0 | UI |
+| python-dotenv | ≥1.0.0 | Environment variable management |
+| pytest | ≥8.0.0 | Testing |
+
+</details>
 
 ---
 
