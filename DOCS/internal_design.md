@@ -9,35 +9,38 @@
 ## 1. System Architecture Diagram
 
 ```
-+----------------------------------------------------------+
-|                  Streamlit (app.py)                      |
-|  +----------------------+  +---------------------------+ |
-|  |  Main Screen         |  |  Sidebar                  | |
-|  |  (Job Input/Results) |  |  (Index Build)            | |
-+--+----------------------+--+---------------------------+-+
-   |                     |  |                          |
-   | Search Query        |  | Build Trigger            |
-   v                     |  v                          |
-+------------------+     | +----------------------+    |
-|  retriever.py    |     | |   embedder.py         |    |
-|  Similarity      |     | |   Embedding / DB      |    |
-|  Search          |     | |   Registration        |    |
-+--------+---------+     | +----------+-----------+    |
-         |               |            |               |
-         | Top-k Results |            | Vector Insert  |
-         v               |            v               |
-+------------------+     | +----------------------+   |
-|  chain.py        |     | |   ChromaDB            |   |
-|  LLM-based       |     +-|   (Local File)        +---+
-|  Reason Gen      |       +----------------------+
-+--------+---------+                  ^
-         | Reason Text                |
-         v                            |
-+------------------+    +---------------------------+
-|  Streamlit UI    |    |   OpenAI API               |
-|  Result Display  |    |   - Embeddings             |
-+------------------+    |   - Chat Completions       |
-                        +---------------------------+
++-----------------------------------------------------------------+
+|                      Streamlit (app.py)                         |
+|  +---------------------------+  +----------------------------+  |
+|  |          Sidebar          |  |        Main Screen         |  |
+|  |       (Index Build)       |  |   (Job Input / Results)    |  |
+|  +-------------+-------------+  +-------------+--------------+  |
++---------------+---------------------------------+---------------+
+                |                                 |
+         Build Trigger                      Search Query
+                |                                 |
+                v                                 v
+  +--------------+------------+    +-------------+------------+
+  |        embedder.py        |    |        retriever.py      |
+  |   Embedding / DB Reg.     |    |      Similarity Search   |
+  +--------------+------------+    +-------------+------------+
+                |                                 |
+         Vector Insert                     Top-k Results
+                |                                 |
+                v                                 v
+  +--------------+------------+    +-------------+------------+
+  |          ChromaDB         |    |          chain.py        |
+  |       (Local File)        |    |      LLM Reason Gen      |
+  +---------------------------+    +-------------+------------+
+                                                 |
+                                           Reason Text
+                                                 |
+                                                 v
+  +---------------------------+    +-------------+------------+
+  |         OpenAI API        |    |        Streamlit UI      |
+  |   - Embeddings            |    |       Result Display     |
+  |   - Chat Completions      |    +--------------------------+
+  +---------------------------+
 ```
 
 **Data Flow Summary**
