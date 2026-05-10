@@ -8,7 +8,7 @@
 
 ## 1. Testing Policy
 
-- Since this is a demo application, confirming that "core use cases work end-to-end" is prioritized over rigorous quality assurance.
+- Confirming "core use cases work end-to-end" and "rigorous quality assurance".
 - Because the system depends on an external API (OpenAI), mocks should be used as much as possible in unit tests.
 - RAG accuracy evaluation is primarily qualitative; quantitative metrics (Top-3 precision) are used as supplementary measurements.
 - Testing is conducted by a single developer via manual testing + pytest.
@@ -71,8 +71,6 @@
 
 | Item | Detail |
 |------|--------|
-| OS | macOS (development machine) |
-| Python | 3.14 (venv) |
 | ChromaDB | Temporary directory via pytest `tmp_path` fixture (auto-cleaned) |
 | OpenAI API | Real API key used (be mindful of test cost budget) |
 
@@ -93,7 +91,7 @@
 
 | Test Type | Usage |
 |-----------|-------|
-| Integration tests / System tests | Use actual data as-is |
+| Integration tests / System tests | Use fictional data as-is |
 | Unit tests | Not used. All existing unit tests operate solely on engineer data or inline dicts. |
 
 ### `engineers.json` (Engineer Data — 20 records)
@@ -118,7 +116,7 @@
 ### Unit Tests
 
 - All pytest cases must PASS (0 errors, 0 failures)
-- Coverage: At minimum, key branches in core functions must be covered
+- At minimum, key branches in core functions must be covered
 
 ### Integration Tests
 
