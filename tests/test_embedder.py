@@ -1,20 +1,20 @@
 """
-Unit tests for embedder.py
-Test cases: E-01, E-02, E-05
+embedder.py のユニットテスト。
+テストケース:E-01, E-02, E-05
 """
 import pytest
 
 from rag.embedder import build_profile_text, load_engineers
 
 
-# E-01: Load engineers.json and return a list of 20 records
+# E-01:engineers.json を読み込み、20件のリストを返却する
 def test_load_engineers_returns_20_records():
     engineers = load_engineers()
     assert isinstance(engineers, list)
     assert len(engineers) == 20
 
 
-# E-02: build_profile_text returns a string containing name, skills, and years of experience
+# E-02:build_profile_text が氏名・スキル・経験年数を含む文字列を返却する
 def test_build_profile_text_contains_required_fields():
     engineer = {
         "id": "eng_001",
@@ -43,7 +43,7 @@ def test_build_profile_text_contains_required_fields():
     assert "8.5" in text
 
 
-# E-05: Passing a non-existent path raises FileNotFoundError
+# E-05:存在しないパスを渡すと FileNotFoundError が発生する
 def test_load_engineers_raises_file_not_found():
     with pytest.raises(FileNotFoundError):
         load_engineers("/nonexistent/path/engineers.json")

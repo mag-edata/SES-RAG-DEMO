@@ -1,12 +1,12 @@
 """
-Unit tests for chain.py
-Test cases: C-01, C-02, C-03
+chain.py のユニットテスト。
+テストケース:C-01, C-02, C-03
 """
 from unittest.mock import MagicMock, patch
 
 from rag.chain import build_prompt, generate_reasons
 
-# Fixed test data — values derived from eng_001 / eng_002 and job_001 in data/*.json
+# 固定テストデータ — 値は data/*.json の eng_001 / eng_002 および job_001 から派生
 SAMPLE_CANDIDATES = [
     {
         "id": "eng_001",
@@ -29,14 +29,14 @@ SAMPLE_CANDIDATES = [
 JOB_TEXT = "大規模な勘定系システムのリプレイスプロジェクト。Spring BootによるREST API開発およびマイクロサービス化を担当。既存COBOLシステムの解析・移行も含む。"
 
 
-# C-01: build_prompt returns a non-empty string
+# C-01:build_prompt が空でない文字列を返却する
 def test_build_prompt_returns_nonempty_string():
     prompt = build_prompt(JOB_TEXT, SAMPLE_CANDIDATES)
     assert isinstance(prompt, str)
     assert len(prompt) > 0
 
 
-# C-02: build_prompt output contains job requirement text and candidate engineer names
+# C-02:build_prompt の出力に案件要件テキストと候補エンジニア名が含まれる
 def test_build_prompt_contains_job_text_and_candidate_names():
     prompt = build_prompt(JOB_TEXT, SAMPLE_CANDIDATES)
     assert "勘定系システム" in prompt
@@ -44,7 +44,7 @@ def test_build_prompt_contains_job_text_and_candidate_names():
     assert "eng_002" in prompt
 
 
-# C-03: generate_reasons returns a string when LLM is mocked
+# C-03:LLMをモック化した場合に generate_reasons が文字列を返却する
 def test_generate_reasons_returns_string_with_mocked_llm():
     mock_response = MagicMock()
     mock_response.content = (
