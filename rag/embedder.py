@@ -1,4 +1,4 @@
-"""Embedding generation and ChromaDB index management for engineer profiles."""
+"""エンジニアプロフィールのEmbedding生成とChromaDBインデックス管理。"""
 
 import json
 import os
@@ -13,26 +13,26 @@ ENGINEERS_DATA_PATH = "./data/engineers.json"
 
 
 def load_engineers(filepath: str = ENGINEERS_DATA_PATH) -> list[dict]:
-    """Load engineer profiles from a JSON file.
+    """JSONファイルからエンジニアプロフィールを読み込む。
 
     Args:
-        filepath: Path to the JSON file containing engineer data.
+        filepath: エンジニアデータを含むJSONファイルのパス。
 
     Returns:
-        A list of engineer profile dicts.
+        エンジニアプロフィール辞書のリスト。
     """
     with open(filepath, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def build_profile_text(engineer: dict) -> str:
-    """Serialize an engineer profile dict into a single text string for embedding.
+    """エンジニアプロフィール辞書をEmbedding入力用の単一テキストに直列化する。
 
     Args:
-        engineer: A dict with keys such as 氏名, 概要, スキル, 経験年数, and 経歴.
+        engineer: 氏名・概要・スキル・経験年数・経歴などのキーを持つ辞書。
 
     Returns:
-        A concatenated string representation of the engineer's profile.
+        エンジニアプロフィールを連結した文字列表現。
     """
     name = engineer.get("氏名", "")
     summary = engineer.get("概要", "")
@@ -46,18 +46,17 @@ def build_profile_text(engineer: dict) -> str:
 
 
 def build_index(engineers: list[dict] = None, collection_name: str = COLLECTION_NAME) -> int:
-    """Embed all engineer profiles and store them in a ChromaDB collection.
+    """全エンジニアプロフィールをEmbedding化しChromaDBコレクションに登録する。
 
-    Drops any existing collection with the same name before rebuilding, ensuring
-    idempotent execution.
+    同名の既存コレクションを削除してから再構築するため、冪等に実行できる。
 
     Args:
-        engineers: List of engineer profile dicts. Loads from the default JSON
-            file when None.
-        collection_name: Name of the ChromaDB collection to create.
+        engineers: エンジニアプロフィール辞書のリスト。Noneの場合は
+            デフォルトのJSONファイルから読み込む。
+        collection_name: 作成するChromaDBコレクションの名前。
 
     Returns:
-        The number of engineer documents indexed.
+        インデックスに登録したエンジニアドキュメントの件数。
     """
     if engineers is None:
         engineers = load_engineers()
@@ -65,7 +64,7 @@ def build_index(engineers: list[dict] = None, collection_name: str = COLLECTION_
     openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     chroma = chromadb.PersistentClient(path=CHROMA_PERSIST_DIR)
 
-    # Delete existing collection and rebuild to ensure idempotency
+    # 冪等性を保証するため、既存コレクションを削除して再構築する
     try:
         chroma.delete_collection(collection_name)
     except Exception:

@@ -1,4 +1,4 @@
-"""RAG chain: retrieves candidate engineers and generates match reasoning via LLM."""
+"""RAGチェイン:候補エンジニアを検索し、LLMでマッチング理由を生成する。"""
 
 import os
 import re
@@ -48,14 +48,14 @@ _PROMPT = PromptTemplate(
 
 
 def build_prompt(job_text: str, candidates: list[dict]) -> str:
-    """Format job requirements and candidate list into the LLM prompt string.
+    """案件要件と候補リストをLLM向けのプロンプト文字列に整形する。
 
     Args:
-        job_text: Raw job description or requirement text.
-        candidates: List of candidate dicts as returned by retrieve().
+        job_text: 案件説明または要件のテキスト原文。
+        candidates: retrieve() が返却する候補辞書のリスト。
 
     Returns:
-        A formatted prompt string ready to be sent to the LLM.
+        LLMにそのまま送信可能な整形済みプロンプト文字列。
     """
     lines = []
     for i, c in enumerate(candidates, 1):
@@ -69,15 +69,15 @@ def build_prompt(job_text: str, candidates: list[dict]) -> str:
 
 
 def _parse_per_candidate_reasons(text: str, n: int) -> list[str]:
-    """Split LLM output into per-candidate reason strings using [Candidate N] markers.
+    """LLM出力を [Candidate N] マーカーで分割し、候補ごとの理由文字列に変換する。
 
     Args:
-        text: Raw LLM response text containing structured [Candidate N] sections.
-        n: Expected number of candidates to extract.
+        text: 構造化された [Candidate N] セクションを含むLLM応答テキスト原文。
+        n: 抽出を期待する候補数。
 
     Returns:
-        A list of length n where each element is the reason text for the
-        corresponding candidate. Returns an empty string for any section not found.
+        長さnのリスト。各要素は対応する候補の理由テキスト。
+        該当セクションが見つからない場合は空文字列を返す。
     """
     reasons = []
     for i in range(1, n + 1):
@@ -88,14 +88,14 @@ def _parse_per_candidate_reasons(text: str, n: int) -> list[str]:
 
 
 def generate_reasons(job_text: str, candidates: list[dict]) -> str:
-    """Call the LLM to generate match reasoning for each candidate engineer.
+    """LLMを呼び出して、各候補エンジニアのマッチング理由を生成する。
 
     Args:
-        job_text: Job description used as context for the LLM.
-        candidates: List of candidate dicts as returned by retrieve().
+        job_text: LLMのコンテキストとして使用する案件説明。
+        candidates: retrieve() が返却する候補辞書のリスト。
 
     Returns:
-        Raw LLM response text containing per-candidate explanations.
+        候補ごとの説明を含むLLM応答テキスト原文。
     """
     llm = ChatOpenAI(
         model=LLM_MODEL,
@@ -112,20 +112,19 @@ def generate_reasons(job_text: str, candidates: list[dict]) -> str:
 
 
 def run_rag(job_description: str, k: int = TOP_K) -> list[dict]:
-    """Execute the full RAG pipeline: retrieve candidates and generate reasoning.
+    """RAGパイプライン全体を実行し、候補取得と理由生成をまとめて行う。
 
-    This is the main entry point for the application. It retrieves the top-k
-    matching engineers via semantic search and augments each result with an
-    LLM-generated explanation of why they fit the job.
+    アプリケーションのメインエントリーポイント。意味検索でマッチング上位k件の
+    エンジニアを取得し、各結果に対してLLMが生成したマッチング理由を付与する。
 
     Args:
-        job_description: Free-text job requirements to match against engineers.
-        k: Number of candidate engineers to retrieve and explain.
+        job_description: エンジニアとマッチングする案件要件の自由形式テキスト。
+        k: 取得および説明を生成する候補エンジニアの件数。
 
     Returns:
-        A list of dicts, each with keys:
-            - engineer: candidate dict from retrieve()
-            - reason: LLM-generated explanation string for this candidate
+        以下のキーを持つ辞書のリスト:
+            - engineer: retrieve() が返却する候補辞書
+            - reason: 当該候補に対するLLM生成の説明文字列
     """
     candidates = retrieve(job_description, k=k)
     reason_text = generate_reasons(job_description, candidates)
