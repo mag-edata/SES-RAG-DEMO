@@ -13,33 +13,33 @@ LLM_TEMPERATURE = 0.3
 LLM_MAX_TOKENS = 800
 
 _SYSTEM_PROMPT = (
-    "You are an expert in SES matching. "
-    "Based on the job requirements and candidate engineer profiles provided, "
-    "explain with supporting evidence why each engineer is a good fit for this job. "
-    "This explanation is intended to assist human decision-making and does not guarantee hiring outcomes."
+    "あなたはSESマッチングの専門家です。"
+    "提示された案件要件と候補エンジニアのプロフィールに基づき、"
+    "各エンジニアがこの案件に適している理由を根拠とともに説明してください。"
+    "本説明は人間の意思決定を補助するためのものであり、採用結果を保証するものではありません。"
 )
 
 _USER_TEMPLATE = """\
-[Job Requirements]
+[案件要件]
 {job_text}
 
-[Candidate Engineer List]
+[候補エンジニア一覧]
 {candidates_text}
 
-For each candidate engineer, explain in 2-3 bullet points (in Japanese) how they align with the job requirements.
-Use exactly this format (do not omit any [Candidate N] header):
+各候補エンジニアについて、2〜3項目の箇条書きで案件要件との整合性を日本語で説明してください。
+以下のフォーマットを厳密に守り、いずれの [候補N] ヘッダーも省略しないでください:
 
-[Candidate 1]
-- reason
-- reason
+[候補1]
+- 理由
+- 理由
 
-[Candidate 2]
-- reason
-- reason
+[候補2]
+- 理由
+- 理由
 
-[Candidate 3]
-- reason
-- reason"""
+[候補3]
+- 理由
+- 理由"""
 
 _PROMPT = PromptTemplate(
     input_variables=["job_text", "candidates_text"],
@@ -59,20 +59,20 @@ def build_prompt(job_text: str, candidates: list[dict]) -> str:
     """
     lines = []
     for i, c in enumerate(candidates, 1):
-        lines.append(f"Candidate {i}: {c['name']}")
-        lines.append(f"Skills: {c['skills']}")
-        lines.append(f"Experience: {c.get('experience_years', '')} years")
-        lines.append(f"Similarity score: {c['score']:.3f}")
+        lines.append(f"候補 {i}: {c['name']}")
+        lines.append(f"スキル: {c['skills']}")
+        lines.append(f"経験年数: {c.get('experience_years', '')} 年")
+        lines.append(f"類似度スコア: {c['score']:.3f}")
         lines.append("")
     candidates_text = "\n".join(lines)
     return _PROMPT.format(job_text=job_text, candidates_text=candidates_text)
 
 
 def _parse_per_candidate_reasons(text: str, n: int) -> list[str]:
-    """LLM出力を [Candidate N] マーカーで分割し、候補ごとの理由文字列に変換する。
+    """LLM出力を [候補N] マーカーで分割し、候補ごとの理由文字列に変換する。
 
     Args:
-        text: 構造化された [Candidate N] セクションを含むLLM応答テキスト原文。
+        text: 構造化された [候補N] セクションを含むLLM応答テキスト原文。
         n: 抽出を期待する候補数。
 
     Returns:
@@ -81,7 +81,7 @@ def _parse_per_candidate_reasons(text: str, n: int) -> list[str]:
     """
     reasons = []
     for i in range(1, n + 1):
-        pattern = rf'\[Candidate {i}\](.*?)(?=\[Candidate {i + 1}\]|$)'
+        pattern = rf'\[候補{i}\](.*?)(?=\[候補{i + 1}\]|$)'
         match = re.search(pattern, text, re.DOTALL)
         reasons.append(match.group(1).strip() if match else "")
     return reasons

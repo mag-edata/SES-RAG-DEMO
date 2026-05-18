@@ -48,8 +48,8 @@ def test_build_prompt_contains_job_text_and_candidate_names():
 def test_generate_reasons_returns_string_with_mocked_llm():
     mock_response = MagicMock()
     mock_response.content = (
-        "Candidate 1 (Test Engineer A) has hands-on Python and AWS experience, making them a strong fit.\n"
-        "Candidate 2 (Test Engineer B) is a Java veteran; note the language difference."
+        "[候補1]\n- PythonとAWSの実務経験があり、適合度が高い。\n"
+        "[候補2]\n- Javaのベテランで、言語の差異に留意が必要。"
     )
 
     with patch("rag.chain.ChatOpenAI") as mock_llm_class:
