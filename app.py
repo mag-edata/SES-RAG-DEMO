@@ -1,4 +1,4 @@
-"""Streamlit entry point: job requirement input, index build, and RAG-based engineer matching UI."""
+"""Streamlitエントリーポイント:案件要件入力・インデックス構築・RAGによるエンジニアマッチングUI。"""
 
 import os
 
@@ -13,20 +13,20 @@ try:
 except Exception:
     pass
 
-st.set_page_config(page_title="IT Engineer & Job Requirement Matching (RAG Demo)", layout="wide")
-st.title("IT Engineer & Job Requirement Matching (RAG Demo)")
+st.set_page_config(page_title="ITエンジニア × 案件要件マッチング（RAGデモ）", layout="wide")
+st.title("ITエンジニア × 案件要件マッチング（RAGデモ）")
 st.caption("案件要件を入力すると、RAGを用いて最適なエンジニア候補Top-3を提示します。")
 
 # ──────────────────────────────
-# Sidebar: Index build
+# サイドバー:インデックス構築
 # ──────────────────────────────
 with st.sidebar:
-    st.header("Admin Menu")
+    st.header("管理メニュー")
     st.write("初回利用前にインデックスを構築してください。")
 
-    if st.button("Build Index"):
+    if st.button("インデックス構築"):
         if not os.environ.get("OPENAI_API_KEY"):
-            st.error("API key is not configured. Please check your .env file.")
+            st.error("APIキーが設定されていません。.env ファイルを確認してください。")
         else:
             try:
                 from rag.embedder import build_index
@@ -34,11 +34,11 @@ with st.sidebar:
                     count = build_index()
                 st.success(f"インデックス構築完了：{count} 件登録")
             except FileNotFoundError:
-                st.error("Failed to load data file. Please check the file path.")
+                st.error("データファイルの読み込みに失敗しました。ファイルパスを確認してください。")
             except Exception as e:
-                st.error(f"API call failed. Please wait a moment and try again.\n{e}")
+                st.error(f"API呼び出しに失敗しました。しばらく待ってから再試行してください。\n{e}")
 
-    # Show current record count
+    # 現在の登録件数を表示
     try:
         import chromadb
         chroma = chromadb.PersistentClient(path="./chroma_db")
@@ -48,7 +48,7 @@ with st.sidebar:
         st.metric("登録済みエンジニア数", 0)
 
 # ──────────────────────────────
-# Main: Run matching
+# メイン:マッチング実行
 # ──────────────────────────────
 job_text = st.text_area(
     "案件要件を入力してください",
@@ -74,9 +74,9 @@ job_text = st.text_area(
 
 if st.button("マッチング実行", type="primary"):
     if not job_text.strip():
-        st.error("Please enter job requirements.")
+        st.error("案件要件を入力してください。")
     elif not os.environ.get("OPENAI_API_KEY"):
-        st.error("API key is not configured. Please check your .env file.")
+        st.error("APIキーが設定されていません。.env ファイルを確認してください。")
     else:
         try:
             from rag.chain import run_rag
@@ -84,13 +84,13 @@ if st.button("マッチング実行", type="primary"):
                 results = run_rag(job_text)
 
             if not results:
-                st.error("No matching engineers found. Please try different requirements.")
+                st.error("該当するエンジニアが見つかりませんでした。要件を変更して再度お試しください。")
             else:
                 st.subheader("マッチング結果 Top 3")
                 for i, result in enumerate(results, 1):
                     eng = result["engineer"]
                     with st.expander(
-                        f"候補 {i}：{eng['name']}　（類似度スコア: {eng['score']:.3f}）",
+                        f"候補 {i}:{eng['name']}　(類似度スコア: {eng['score']:.3f})",
                         expanded=True,
                     ):
                         st.write(f"**スキル:** {eng['skills']}")
@@ -100,8 +100,8 @@ if st.button("マッチング実行", type="primary"):
         except Exception as e:
             err = str(e)
             if "does not exist" in err or "No collection" in err:
-                st.error("Index not built. Please build it from the sidebar.")
+                st.error("インデックスが構築されていません。サイドバーから構築してください。")
             elif "AuthenticationError" in err or "api_key" in err.lower():
-                st.error("API key is not configured. Please check your .env file.")
+                st.error("APIキーが設定されていません。.env ファイルを確認してください。")
             else:
-                st.error(f"API call failed. Please wait a moment and try again.\n{err}")
+                st.error(f"API呼び出しに失敗しました。しばらく待ってから再試行してください。\n{err}")
