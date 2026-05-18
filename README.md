@@ -1,271 +1,271 @@
 # SES-RAG-DEMO
 
-> RAG-based decision support system for semantically matching SES job requirements with engineer profiles.
+> SES案件要件とエンジニアプロフィールを意味的にマッチングするRAGベースの意思決定支援システム。
 
-- Retrieves top candidate engineers based on semantic similarity — beyond keyword matching
-- Generates structured reasoning for why each candidate matches, not just a ranked list
-- Designed as decision-support infrastructure, not automation
+- キーワード一致を超えた意味的類似度により、候補エンジニアの上位を取得する
+- 単なるランキングではなく、各候補がマッチする理由を構造化された形で生成する
+- 自動化ではなく、意思決定支援基盤として設計
 
 ---
 
-## Demo
+## デモ
 
 !["result_010.png"](/DOCS/result_010.png)
 
 > [https://ses-rag-demo-main.streamlit.app/]
 
-> **First-time use:** Click **Build Index** in the sidebar to initialize the engineer vector index before running a match.
+> **初回利用時:** マッチング実行前に、サイドバーの **Build Index** をクリックしてエンジニアのベクトルインデックスを初期化してください。
 
 ---
 
-## Problem
+## 課題
 
-In SES sales, matching job requirements with engineer profiles is a time-consuming and highly subjective process.
+SES営業の現場では、案件要件とエンジニアプロフィールのマッチングは時間がかかり、属人性の高いプロセスとなっている。
 
-### core bottlenecks:
+### 中核的なボトルネック
 
-- **High search cost**
-  Salespersons spend significant time identifying potential candidates from large pools of engineer profiles.
+- **高い検索コスト**
+  営業担当が大量のエンジニアプロフィールから候補を絞り込むのに多大な時間を要する。
 
-- **Skill-dependent decision quality**
-  The quality of matching depends heavily on individual experience, leading to inconsistent outcomes.
+- **判断品質のスキル依存**
+  マッチング品質が個人の経験に大きく依存し、結果に一貫性が生まれない。
 
-- **Lack of explainability**
-  Even when a candidate is selected, reasoning is often implicit and difficult to standardize or share.
+- **説明可能性の欠如**
+  候補を選定しても、その理由は暗黙的で、標準化・共有が難しい。
 
-As a result:
-- Slow candidate shortlisting
-- High variance in matching quality
-- Limited reproducibility of successful decisions
+その結果として:
+- 候補の絞り込みが遅い
+- マッチング品質のばらつきが大きい
+- 成功した判断の再現性が低い
 
-### Why this is structurally hard to automate
+### なぜ構造的に自動化が難しいのか
 
-SES matching fails with keyword search not just because of scale, but because of structural ambiguity in the data itself:
+SESマッチングがキーワード検索で破綻するのは規模の問題だけではなく、データそのものに含まれる構造的な曖昧さに起因する:
 
-- **Skill notation variance** — "Java", "Java SE", "J2EE", and "Spring Boot" may represent overlapping or distinct competencies depending on context
-- **Implicit capabilities** — an engineer's résumé rarely captures transferable skills or domain intuition not tied to a named technology
-- **Recency bias** — matching systems tend to over-weight the most recently listed skills, even when older experience is more relevant
-- **Domain transferability** — experience in automotive control systems may be highly relevant to aerospace firmware, but keyword overlap will be near zero (e.g., AUTOSAR vs DO-178C)
+- **スキル表記の揺れ** — 「Java」「Java SE」「J2EE」「Spring Boot」は文脈によって重なる能力を指す場合も、別物を指す場合もある
+- **暗黙の能力** — エンジニアの職務経歴書には、特定の技術名に紐づかない応用力や領域勘が記載されないことが多い
+- **直近バイアス** — マッチングシステムは直近のスキルを過大評価しがちで、より関連性の高い過去の経験を見落としやすい
+- **領域間の転用可能性** — 自動車制御システムの経験は航空機ファームウェアにも高い関連性を持つが、キーワード重複はほぼゼロになる(例:AUTOSAR と DO-178C)
 
-These factors make the problem a **semantic understanding problem**, not a lookup problem.
-
----
-
-## Solution
-
-This system reframes matching as a **decision-support problem**, not just a search problem.
-
-Using Retrieval-Augmented Generation (RAG), it:
-
-1. **Reduces search time**  
-   Retrieves top candidate engineers based on semantic similarity
-
-2. **Standardizes decision-making**  
-   Generates structured reasoning for why each candidate matches the requirements
-
-3. **Improves reproducibility**  
-   Makes implicit judgment criteria explicit and shareable
+これらの要因により、本問題は**ルックアップの問題ではなく、意味理解の問題**となる。
 
 ---
 
-## Architecture
+## ソリューション
 
-This system uses Retrieval-Augmented Generation (RAG) to:
+本システムはマッチングを単なる検索問題ではなく、**意思決定支援の問題**として再定義する。
 
-1. Embed job requirements and engineer profiles into vector space
-2. Retrieve top-k candidates by semantic similarity
-3. Generate reasoning for each match using LLM
+RAG(Retrieval-Augmented Generation)を用いて以下を実現する:
+
+1. **検索時間の削減**
+   意味的類似度に基づき、候補エンジニア上位を取得
+
+2. **判断の標準化**
+   候補が要件にマッチする理由を構造化された形で生成
+
+3. **再現性の向上**
+   暗黙の判断基準を明示化・共有可能にする
+
+---
+
+## アーキテクチャ
+
+本システムはRAGを使って以下を行う:
+
+1. 案件要件とエンジニアプロフィールをベクトル空間にEmbedding
+2. 意味的類似度により上位k件の候補を取得
+3. LLMによって各マッチングの理由を生成
 
 ```
-[Job Requirements]
+[案件要件]
         ↓ Embedding
-[Vector DB (Chroma)] ← [Engineer Profiles]
-        ↓ Top-k Retrieval
-[LLM Reasoning Layer]
+[ベクトルDB (Chroma)] ← [エンジニアプロフィール]
+        ↓ Top-k 取得
+[LLM 理由生成レイヤ]
         ↓
-[Top Matches + Explanation]
+[上位マッチ + 説明文]
 ```
 
-Example:
+例:
 
-Input (Job Requirement)
-- Backend engineer (Java)
-- AWS experience
-- Microservices architecture
+入力(案件要件)
+- バックエンドエンジニア(Java)
+- AWS経験あり
+- マイクロサービスアーキテクチャ
 
-Output (Top Match)
+出力(上位マッチ)
 
-**Engineer A**
+**エンジニア A**
 
-**Why matched:**
-- 3+ years AWS (EC2, Lambda)
-- Designed microservices-based systems
-- Experience in scalability optimization
+**マッチング理由:**
+- AWS経験3年以上(EC2, Lambda)
+- マイクロサービス型システムの設計経験あり
+- スケーラビリティ最適化の実績あり
 
-→ Not keyword overlap, but **contextual alignment in system design experience**
-
----
-
-## Evaluation
-
-### Current Validation
-
-Unit tests: 28 passing across embedding, retrieval, and chain logic.  
-Match outputs reviewed manually against domain knowledge.
-
-### Why no automated metrics yet
-
-Automated retrieval evaluation (e.g., Precision@K) requires human-labeled ground truth —  
-a judgment of which engineer is the "correct" match for each job requirement.
-
-For this prototype, the design priority was validating the decision-support framing:  
-confirming that LLM-generated explanations are grounded in retrieval, not hallucinated.  
-Precision optimization comes after that baseline is established.
-
-**Planned metrics:** Precision@3, explanation usefulness (human evaluation), latency, token cost per query.
+→ キーワード重複ではなく、**システム設計経験における文脈的整合性**
 
 ---
 
-## Design Decisions
+## 評価
 
-### Why RAG (not keyword search)
+### 現時点の検証
 
-- Captures semantic similarity beyond exact terms
-- Handles implicit skill representation
-- Enables reasoning layer (not just retrieval)
+ユニットテスト:Embedding・検索・チェインロジックにわたり28件がPass。
+マッチング出力は領域知識に照らして人手で確認。
 
+### 自動メトリクスがまだない理由
 
-### Why Top-3
+自動的な検索評価(例:Precision@K)には人手でラベル付けされた正解データが必要となる。
+すなわち「どのエンジニアが各案件にとって "正解" のマッチか」の人間判断である。
 
-- Matches real salesperson workflow (shortlist candidates)
-- Trade-off between recall and decision cost
+本プロトタイプの設計上の優先度は、意思決定支援としての枠組みを検証することにあった。
+LLMが生成する説明が検索結果に基づいており、ハルシネーションでないことの確認である。
+精度の最適化は、このベースラインが確立した後の課題と位置づけている。
 
-
-### Why text-embedding-3-small
-
-- Sufficient semantic performance for prototype
-- Lower cost → faster iteration
-
-### Why ChromaDB
-
-- **Local-first**: runs in-process with no server setup — suitable for rapid prototyping
-- **Low operational overhead**: persistent storage without infrastructure management
-- **Fast iteration**: easy to rebuild the index during development without migration complexity
-
-### Why explanation matters
-
-In SES sales, selecting a candidate is not enough — the salesperson must also explain *why*.
-
-This system externalizes that reasoning, enabling:
-- Knowledge sharing across team members
-- Reduced dependency on individual experience
+**今後の指標:** Precision@3、説明の有用性(人手評価)、レイテンシ、クエリあたりのトークンコスト。
 
 ---
 
-## Limitations
+## 設計判断
 
-- Dataset scale: 20 jobs × 20 engineers (synthetic) — sufficient for pipeline and schema validation; production scaling would require real-world data ingestion and evaluation
-- No automated evaluation metrics (manual only)
-- Sensitive to prompt quality
+### なぜRAGか(キーワード検索ではなく)
+
+- 完全一致を超えた意味的類似度を捉えられる
+- スキルの暗黙的表現に対応できる
+- 検索結果に加えて推論レイヤを追加できる
+
+
+### なぜTop-3か
+
+- 営業担当の実際のワークフロー(候補ショートリスト化)に整合
+- 再現率と意思決定コストのトレードオフ
+
+
+### なぜtext-embedding-3-smallか
+
+- プロトタイプには十分な意味理解性能
+- 低コスト → 反復速度が上がる
+
+### なぜChromaDBか
+
+- **ローカルファースト:** サーバー不要でプロセス内で動作 — 短期間プロトタイピングに適する
+- **運用負荷が低い:** インフラ管理不要で永続ストレージを利用可能
+- **反復しやすい:** 開発中にインデックスを容易に再構築可能(マイグレーションの複雑さなし)
+
+### なぜ説明が重要か
+
+SES営業では候補を選ぶだけでは不十分で、営業担当はその *理由* も説明できなければならない。
+
+本システムはその推論プロセスを外在化することで、以下を実現する:
+- チームメンバー間での知識共有
+- 個人の経験への依存度の低減
 
 ---
 
-## Tech Stack
+## 制約
 
-| Role | Technology |
+- データ規模:案件20件 × エンジニア20件(架空) — パイプラインとスキーマの検証には十分だが、本番スケールには実データの取り込みと評価が必要
+- 自動評価メトリクスは未導入(人手のみ)
+- プロンプト品質への依存度が高い
+
+---
+
+## 技術スタック
+
+| 役割 | 技術 |
 |---|---|
 | LLM | OpenAI API (gpt-4o-mini) |
 | Embedding | OpenAI text-embedding-3-small |
-| Vector DB | ChromaDB |
-| Framework | LangChain |
+| ベクトルDB | ChromaDB |
+| フレームワーク | LangChain |
 | UI | Streamlit |
-| Language | Python 3.14 |
+| 言語 | Python 3.14 |
 
 ---
 
-## Key Takeaway
+## ポイント
 
-This project demonstrates:
+本プロジェクトは以下を実証する:
 
-- Semantic matching of unstructured text
-- LLM-based reasoning on top of retrieval
-- Designing AI systems as **decision-support infrastructure**, not just automation tools
+- 非構造テキストの意味的マッチング
+- 検索結果を踏まえたLLMによる推論
+- **意思決定支援基盤**としてのAIシステム設計(単なる自動化ツールではなく)
 
 ---
 
-## Getting Started
+## はじめに
 
 ```bash
-# 1. Clone
+# 1. クローン
 git clone https://github.com/mag-edata/SES-RAG-DEMO.git
 cd SES-RAG-DEMO
 
-# 2. Install dependencies
+# 2. 依存パッケージのインストール
 python3.14 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# 3. Set up environment variables
+# 3. 環境変数の設定
 cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
+# .env を編集し OPENAI_API_KEY を設定
 
-# 4. Run
+# 4. 起動
 streamlit run app.py
 
-# 5. On first run, click "Build Index" in the sidebar to populate the
-#    engineer vector index (calls the OpenAI Embeddings API for 20 records).
+# 5. 初回起動時、サイドバーの「Build Index」をクリックして
+#    エンジニアのベクトルインデックスを構築する(OpenAI Embeddings API を20件分呼び出す)。
 ```
 
 <details>
-<summary>Verified Environment</summary>
+<summary>動作確認済み環境</summary>
 
-**Runtime**
+**ランタイム**
 
-| Item | Version / Details |
+| 項目 | バージョン / 詳細 |
 |---|---|
 | OS | macOS Tahoe 26.3.1 |
 | Python | 3.14 |
-| Virtual environment | venv (standard library) |
+| 仮想環境 | venv(標準ライブラリ) |
 
-**Dependencies**
+**依存パッケージ**
 
-| Package | Version | Purpose |
+| パッケージ | バージョン | 用途 |
 |---|---|---|
-| openai | ≥1.0.0 | LLM & Embedding API |
-| langchain | ≥0.3.0 | RAG chain construction |
-| langchain-openai | ≥0.2.0 | LangChain × OpenAI integration |
-| langchain-community | ≥0.3.0 | ChromaDB integration |
-| chromadb | ≥0.5.0 | Vector DB |
+| openai | ≥1.0.0 | LLM / Embedding API |
+| langchain | ≥0.3.0 | RAGチェイン構築 |
+| langchain-openai | ≥0.2.0 | LangChain × OpenAI 連携 |
+| langchain-community | ≥0.3.0 | ChromaDB 連携 |
+| chromadb | ≥0.5.0 | ベクトルDB |
 | streamlit | ≥1.38.0 | UI |
-| python-dotenv | ≥1.0.0 | Environment variable management |
-| pytest | ≥8.0.0 | Testing |
+| python-dotenv | ≥1.0.0 | 環境変数管理 |
+| pytest | ≥8.0.0 | テスト |
 
 </details>
 
 ---
 
-## Project Structure
+## プロジェクト構成
 
 ```
 SES-RAG-DEMO/
-├── app.py                  # Streamlit entry point
+├── app.py                  # Streamlit エントリーポイント
 ├── rag/
-│   ├── embedder.py         # Embedding generation & ChromaDB indexing
-│   ├── retriever.py        # Semantic similarity search
-│   └── chain.py            # LangChain RAG chain
+│   ├── embedder.py         # Embedding 生成と ChromaDB へのインデックス登録
+│   ├── retriever.py        # 意味的類似度検索
+│   └── chain.py            # LangChain RAG チェイン
 ├── data/
-│   ├── jobs.json           # Sample job requirements (20 entries)
-│   └── engineers.json      # Sample engineer profiles (20 entries)
+│   ├── jobs.json           # 案件要件サンプル(20件)
+│   └── engineers.json      # エンジニアプロフィールサンプル(20件)
 ├── tests/
-│   ├── test_embedder.py    # Unit tests: embedding & indexing (E-01, E-02, E-05)
-│   ├── test_retriever.py   # Integration tests: similarity search (E-03, E-04, R-01~R-04)
-│   └── test_chain.py       # Unit tests: RAG chain (C-01, C-02, C-03)
+│   ├── test_embedder.py    # ユニットテスト:Embedding・インデックス(E-01, E-02, E-05)
+│   ├── test_retriever.py   # 結合テスト:類似度検索(E-03, E-04, R-01〜R-04)
+│   └── test_chain.py       # ユニットテスト:RAG チェイン(C-01, C-02, C-03)
 ├── DOCS/
-│   ├── requirements_definition.md
-│   ├── external_design.md
-│   ├── internal_design.md
-│   ├── test_design.md
-│   └── test_cases.md
+│   ├── 要件定義書.md
+│   ├── 基本設計書.md
+│   ├── 詳細設計書.md
+│   ├── テスト設計書.md
+│   └── テスト項目書.md
 ├── requirements.txt
 ├── .env.example
 └── README.md
@@ -273,8 +273,8 @@ SES-RAG-DEMO/
 
 ---
 
-## Background
+## 背景
 
-This project is built on my experience as a former SES sales representative turned Python/NLP engineer. The matching problem is one I observed firsthand — and this demo is my attempt to solve it with modern LLM technology.
+本プロジェクトは、SES営業を経て Python / NLP エンジニアとなった筆者自身の経験に基づいている。マッチングの課題は現場で目の当たりにしてきたものであり、本デモはそれを最新のLLM技術で解こうとする試みである。
 
-The design focus is not just "how to implement RAG" but **"what decision should RAG support"** — treating the matching system as a decision-support tool rather than an automation.
+設計の焦点は「どうRAGを実装するか」ではなく、**「RAGがどの意思決定を支援すべきか」**にある — マッチングシステムを自動化ツールではなく、意思決定支援ツールとして扱うアプローチである。
