@@ -10,7 +10,7 @@
 
 ## デモ
 
-!["result_010.png"](/DOCS/result_010.png)
+!["result_010.png"](./DOCS/result_010.png)
 
 > [https://ses-rag-demo-main.streamlit.app/]
 

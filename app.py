@@ -36,13 +36,14 @@ with st.sidebar:
             except FileNotFoundError:
                 st.error("データファイルの読み込みに失敗しました。ファイルパスを確認してください。")
             except Exception as e:
-                st.error(f"API呼び出しに失敗しました。しばらく待ってから再試行してください。\n{e}")
+                st.error(f"インデックス構築に失敗しました。しばらく待ってから再試行してください。\n{e}")
 
     # 現在の登録件数を表示
     try:
         import chromadb
-        chroma = chromadb.PersistentClient(path="./chroma_db")
-        col = chroma.get_collection("engineers")
+        from rag.embedder import CHROMA_PERSIST_DIR, COLLECTION_NAME
+        chroma = chromadb.PersistentClient(path=CHROMA_PERSIST_DIR)
+        col = chroma.get_collection(COLLECTION_NAME)
         st.metric("登録済みエンジニア数", col.count())
     except Exception:
         st.metric("登録済みエンジニア数", 0)
@@ -90,7 +91,7 @@ if st.button("マッチング実行", type="primary"):
                 for i, result in enumerate(results, 1):
                     eng = result["engineer"]
                     with st.expander(
-                        f"候補 {i}:{eng['name']}　(類似度スコア: {eng['score']:.3f})",
+                        f"候補 {i}: {eng['name']}(類似度スコア {eng['score']:.3f})",
                         expanded=True,
                     ):
                         st.write(f"**スキル:** {eng['skills']}")
