@@ -1,6 +1,6 @@
 """
-Integration tests for embedder.py (index build) and retriever.py (similarity search).
-Test cases: E-03, E-04, R-01, R-02, R-03, R-04
+embedder.py(インデックス構築)と retriever.py(類似度検索)の結合テスト。
+テストケース:E-03, E-04, R-01, R-02, R-03, R-04
 """
 import chromadb
 import pytest
@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 from rag.embedder import build_index
 from rag.retriever import search_engineers
 
-# 3 records from data/engineers.json (eng_001–eng_003) used to satisfy top_k=3
+# top_k=3 を満たすため data/engineers.json の3件(eng_001〜eng_003)を使用
 SAMPLE_ENGINEERS = [
     {
         "id": "eng_001",
@@ -70,13 +70,13 @@ SAMPLE_ENGINEERS = [
     },
 ]
 
-# Fixed 1536-dim vector returned by the mocked OpenAI Embedding API
+# モック化したOpenAI Embedding APIが返却する固定1536次元ベクトル
 FAKE_EMBEDDING = [0.1] * 1536
 
 
 @pytest.fixture
 def chroma_dir(tmp_path, monkeypatch):
-    """Redirect ChromaDB storage to a temp directory for test isolation."""
+    """テスト隔離のため、ChromaDBの保存先を一時ディレクトリにリダイレクトする。"""
     path = str(tmp_path / "chroma_test")
     monkeypatch.setattr("rag.embedder.CHROMA_PERSIST_DIR", path)
     monkeypatch.setattr("rag.retriever.CHROMA_PERSIST_DIR", path)
@@ -85,7 +85,7 @@ def chroma_dir(tmp_path, monkeypatch):
 
 @pytest.fixture
 def mock_openai():
-    """Patch the OpenAI client in both embedder and retriever to return FAKE_EMBEDDING."""
+    """embedder と retriever のOpenAIクライアントをパッチし、FAKE_EMBEDDING を返却させる。"""
     mock_response = MagicMock()
     mock_response.data = [MagicMock(embedding=FAKE_EMBEDDING)]
     mock_client = MagicMock()
@@ -99,13 +99,13 @@ def mock_openai():
 
 @pytest.fixture
 def built_index(chroma_dir, mock_openai):
-    """Pre-build a ChromaDB index from SAMPLE_ENGINEERS for retriever tests."""
+    """retriever テスト用に SAMPLE_ENGINEERS からChromaDBインデックスを事前構築する。"""
     build_index(SAMPLE_ENGINEERS)
     return chroma_dir
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# E-03: build_index() returns the registered record count
+# E-03:build_index() が登録件数を返却する
 # ──────────────────────────────────────────────────────────────────────────────
 def test_build_index_returns_record_count(chroma_dir, mock_openai):
     count = build_index(SAMPLE_ENGINEERS)
@@ -113,7 +113,7 @@ def test_build_index_returns_record_count(chroma_dir, mock_openai):
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# E-04: Running build_index() twice does not create duplicate entries
+# E-04:build_index() を2回実行しても重複登録されない
 # ──────────────────────────────────────────────────────────────────────────────
 def test_build_index_twice_no_duplicates(chroma_dir, mock_openai):
     build_index(SAMPLE_ENGINEERS)
@@ -126,7 +126,7 @@ def test_build_index_twice_no_duplicates(chroma_dir, mock_openai):
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# R-01: search_engineers() returns a list
+# R-01:search_engineers() がリストを返却する
 # ──────────────────────────────────────────────────────────────────────────────
 def test_search_engineers_returns_list(built_index):
     results = search_engineers("Python backend developer")
@@ -134,7 +134,7 @@ def test_search_engineers_returns_list(built_index):
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# R-02: top_k=3 returns exactly 3 records
+# R-02:top_k=3 で3件返却される
 # ──────────────────────────────────────────────────────────────────────────────
 def test_search_engineers_returns_top_k_records(built_index):
     results = search_engineers("Python backend developer", top_k=3)
@@ -142,7 +142,7 @@ def test_search_engineers_returns_top_k_records(built_index):
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# R-03: each result element contains id / document / distance / metadata
+# R-03:結果の各要素に id / document / distance / metadata が含まれる
 # ──────────────────────────────────────────────────────────────────────────────
 def test_search_engineers_result_has_required_keys(built_index):
     results = search_engineers("Python backend developer", top_k=1)
@@ -150,11 +150,11 @@ def test_search_engineers_result_has_required_keys(built_index):
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# R-04: all distance values fall within ChromaDB cosine distance range [0.0, 2.0]
+# R-04:すべての distance が ChromaDB のコサイン距離範囲 [0.0, 2.0] に収まる
 # ──────────────────────────────────────────────────────────────────────────────
 def test_search_engineers_distance_in_valid_range(built_index):
     results = search_engineers("Python backend developer", top_k=3)
     for r in results:
-        # ChromaDB cosine distance is theoretically [0, 2], but floating-point
-        # arithmetic can produce values slightly below 0 (~-1e-5) for identical vectors.
+        # ChromaDB のコサイン距離は理論上 [0, 2] だが、同一ベクトル間では
+        # 浮動小数点演算により 0 をわずかに下回る値(〜-1e-5)が生じうる。
         assert -1e-4 <= r["distance"] <= 2.0

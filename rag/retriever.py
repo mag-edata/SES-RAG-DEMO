@@ -1,4 +1,4 @@
-"""Similarity search over the ChromaDB engineer index."""
+"""ChromaDBエンジニアインデックスに対する類似度検索。"""
 
 import os
 
@@ -11,28 +11,28 @@ TOP_K = 3
 
 
 def get_collection(collection_name: str = COLLECTION_NAME):
-    """Open and return an existing ChromaDB collection.
+    """既存のChromaDBコレクションを開いて返却する。
 
     Args:
-        collection_name: Name of the collection to retrieve.
+        collection_name: 取得するコレクションの名前。
 
     Returns:
-        A ChromaDB Collection object.
+        ChromaDB の Collection オブジェクト。
     """
     chroma = chromadb.PersistentClient(path=CHROMA_PERSIST_DIR)
     return chroma.get_collection(collection_name)
 
 
 def search_engineers(query_text: str, top_k: int = TOP_K) -> list[dict]:
-    """Embed a query string and retrieve the closest engineer documents from ChromaDB.
+    """クエリ文字列をEmbedding化し、ChromaDBから最も近いエンジニアドキュメントを取得する。
 
     Args:
-        query_text: Free-text query describing job requirements or desired skills.
-        top_k: Number of nearest-neighbor results to return.
+        query_text: 案件要件や希望スキルを記述した自由形式のクエリ。
+        top_k: 返却する最近傍結果の件数。
 
     Returns:
-        A list of dicts, each containing id, document, distance, and metadata
-        for a matched engineer.
+        マッチしたエンジニアごとに id・document・distance・metadata を含む
+        辞書のリスト。
     """
     openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     response = openai_client.embeddings.create(model=EMBEDDING_MODEL, input=query_text)
@@ -53,18 +53,18 @@ def search_engineers(query_text: str, top_k: int = TOP_K) -> list[dict]:
 
 
 def retrieve(query: str, k: int = TOP_K) -> list[dict]:
-    """Return the top-k matching engineers for a job query, with similarity scores.
+    """案件クエリに対する上位k件のマッチエンジニアを類似度スコア付きで返却する。
 
-    Wraps search_engineers and normalises the cosine distance into a similarity
-    score in the range [0, 1] (higher is more similar).
+    search_engineers をラップし、コサイン距離を [0, 1] の範囲の類似度スコアへ
+    正規化する(値が大きいほど類似度が高い)。
 
     Args:
-        query: Job description or requirement text used as the search query.
-        k: Maximum number of candidates to return.
+        query: 検索クエリとして使用する案件説明または要件テキスト。
+        k: 返却する候補の最大件数。
 
     Returns:
-        A list of dicts with keys id, name, summary, skills, experience_years,
-        and score, sorted by descending similarity.
+        id・name・summary・skills・experience_years・score をキーに持つ
+        辞書のリスト。類似度の降順でソート済み。
     """
     raw = search_engineers(query, top_k=k)
     return [
